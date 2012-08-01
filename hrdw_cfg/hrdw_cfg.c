@@ -3,6 +3,8 @@
 #include "stm32f10x_usart.h"
 #include "stm32f10x_dma.h"
 #include "stm32f10x_tim.h"
+#include "stm32f10x_exti.h"
+#include "misc.h"
 #include "./hrdw_cfg/hrdw_cfg.h"
 
 void RCC_Configuration(void);
@@ -11,6 +13,7 @@ void NVIC_Configuration(void);
 void DMA_Configuration(void);
 void USART_Configuration(void);
 void TIM_Configuration(void);
+void EXTI_Configuration(void);
 
 void Hardware_Configuration (void)
 {
@@ -26,6 +29,7 @@ void Hardware_Configuration (void)
 	DMA_Configuration();
 	USART_Configuration();
 	TIM_Configuration();
+	EXTI_Configuration();
 }
 
 void RCC_Configuration(void)
@@ -38,6 +42,7 @@ void RCC_Configuration(void)
 			RCC_APB1Periph_TIM3 | RCC_APB1Periph_TIM4, ENABLE);
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
 
+	//Need to disable JTAG to free up PB3 io for TIM2
 	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
 	GPIO_PinRemapConfig(GPIO_FullRemap_TIM2, ENABLE);
 }
@@ -58,7 +63,6 @@ void GPIO_Configuration(void)
 
 	//USART3 - RX - PB11
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 
@@ -78,7 +82,7 @@ void GPIO_Configuration(void)
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3 | GPIO_Pin_6 | GPIO_Pin_7;
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 
-	/*PWM Generation:
+	/* PWM Generation:
 	 * TIM1, TIM1_REMAP[1:0] = “00” (no remap)
 	 * CH1 - CH2 - CH3  - CH4
 	 * PA8 - PA9 - PA10 - PA11
@@ -88,16 +92,64 @@ void GPIO_Configuration(void)
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+	/* EXTI lines configuration
+	 * EXTI0 connected to PA0 - push button on STM32VL-Discovery
+	 * EXTI1 - PC1 (endstop #1)
+	 * EXTI2 - PC2 (endstop #2)
+	 * EXTI3 - PC3 (endstop #3)
+	 * EXTI10 - PC10 (endstop #4)
+	 * EXTI11 - PC11 (endstop #5)
+	 * EXTI12 - PC12 (endstop #6)
+	 */
+	GPIO_EXTILineConfig(GPIO_PortSourceGPIOA, GPIO_PinSource0);
+
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+	GPIO_EXTILineConfig(GPIO_PortSourceGPIOC, GPIO_PinSource1);
+	GPIO_EXTILineConfig(GPIO_PortSourceGPIOC, GPIO_PinSource2);
+	GPIO_EXTILineConfig(GPIO_PortSourceGPIOC, GPIO_PinSource3);
+	GPIO_EXTILineConfig(GPIO_PortSourceGPIOC, GPIO_PinSource10);
+	GPIO_EXTILineConfig(GPIO_PortSourceGPIOC, GPIO_PinSource11);
+	GPIO_EXTILineConfig(GPIO_PortSourceGPIOC, GPIO_PinSource12);
+
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1 | GPIO_Pin_2 |
+			GPIO_Pin_3 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+	GPIO_Init(GPIOC, &GPIO_InitStructure);
 }
 
 void NVIC_Configuration(void)
 {
+	NVIC_InitTypeDef NVIC_InitStructure;
+
 	/* 1 bit for pre-emption priority, 3 bits for subpriority */
 	NVIC_SetPriorityGrouping(6);
 
 	/* Configure USART3 interrupt */
 	NVIC_SetPriority(USART3_IRQn, 0x00);
 	NVIC_EnableIRQ(USART3_IRQn);
+
+
+	/* EXTI irq configuration
+	 *
+	 */
+	NVIC_InitStructure.NVIC_IRQChannel = EXTI0_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStructure);
+
+	NVIC_InitStructure.NVIC_IRQChannel = EXTI1_IRQn;
+	NVIC_Init(&NVIC_InitStructure);
+	NVIC_InitStructure.NVIC_IRQChannel = EXTI2_IRQn;
+	NVIC_Init(&NVIC_InitStructure);
+	NVIC_InitStructure.NVIC_IRQChannel = EXTI3_IRQn;
+	NVIC_Init(&NVIC_InitStructure);
+	NVIC_InitStructure.NVIC_IRQChannel = EXTI15_10_IRQn;
+	NVIC_Init(&NVIC_InitStructure);
 }
 
 void DMA_Configuration(void)
@@ -206,4 +258,29 @@ void TIM_Configuration(void)
     TIM_Cmd(TIM1, ENABLE);
 
     TIM_CtrlPWMOutputs(TIM1, ENABLE);
+}
+
+void EXTI_Configuration(void)
+{
+	EXTI_InitTypeDef EXTI_InitStructure;
+
+	EXTI_InitStructure.EXTI_Line = EXTI_Line0 | EXTI_Line1 | EXTI_Line2 |
+			EXTI_Line3 | EXTI_Line10 | EXTI_Line11 | EXTI_Line12;
+	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
+	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+	EXTI_Init(&EXTI_InitStructure);
+
+	/*EXTI_InitStructure.EXTI_Line = EXTI_Line1;
+	EXTI_Init(&EXTI_InitStructure);
+	EXTI_InitStructure.EXTI_Line = EXTI_Line2;
+	EXTI_Init(&EXTI_InitStructure);
+	EXTI_InitStructure.EXTI_Line = EXTI_Line3;
+	EXTI_Init(&EXTI_InitStructure);
+	EXTI_InitStructure.EXTI_Line = EXTI_Line10;
+	EXTI_Init(&EXTI_InitStructure);
+	EXTI_InitStructure.EXTI_Line = EXTI_Line11;
+	EXTI_Init(&EXTI_InitStructure);
+	EXTI_InitStructure.EXTI_Line = EXTI_Line12;
+	EXTI_Init(&EXTI_InitStructure);*/
 }

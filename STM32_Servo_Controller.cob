@@ -10,6 +10,7 @@
     <Component id="bf7c3c91-96ed-11df-80ae-001d7d723e56" name="CMSIS core"/>
     <Component id="bfa102a1-96ed-11df-80ae-001d7d723e56" name="RCC"/>
     <Component id="bfe42621-96ed-11df-80ae-001d7d723e56" name="GPIO"/>
+    <Component id="bff208d1-96ed-11df-80ae-001d7d723e56" name="EXTI"/>
     <Component id="bff9a9f1-96ed-11df-80ae-001d7d723e56" name="DMA"/>
     <Component id="c064a0c1-96ed-11df-80ae-001d7d723e56" name="TIM"/>
     <Component id="c3dde901-96ed-11df-80ae-001d7d723e56" name="USART"/>

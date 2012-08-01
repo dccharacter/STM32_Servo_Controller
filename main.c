@@ -5,7 +5,10 @@
 int main(void)
 {
 	Hardware_Configuration();
-	printf("\fHi!%c\r\n", ' ');
+
+	// say hi to host
+	printf("start\n\rok\n\r");
+
 	uint16_t tim2, tim3, tim4;
 	uint16_t k = 0;
 
@@ -14,7 +17,7 @@ int main(void)
     	tim2 = TIM_GetCounter(TIM2);
     	tim3 = TIM_GetCounter(TIM3);
     	tim4 = TIM_GetCounter(TIM4);
-    	printf("tim2 = %d, tim3 = %d, tim4 = %d;\r\n", tim2, tim3, tim4);
+    	//printf("tim2 = %d, tim3 = %d, tim4 = %d;\r\n", tim2, tim3, tim4);
     	while (++k);
     }
 }

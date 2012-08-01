@@ -6,6 +6,7 @@
  ********************************************************************************/
 #include <stdio.h>
 #include <stdarg.h>
+#include "stm32f10x_usart.h"
 
 
 /**
@@ -17,10 +18,8 @@
  */
 void PrintChar(char c)
 {
-	/* Send a char like: 
-	   while(Transfer not completed);
-	   Transmit a char;
-	*/	
+	while (USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
+	USART_SendData(USART3, (uint8_t) c);
 }
 
 /** Maximum string size allowed (in bytes). */

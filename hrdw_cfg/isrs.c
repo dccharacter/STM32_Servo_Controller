@@ -8,10 +8,10 @@ void USART3_IRQHandler(void)
 	do
 	{
 		/* Fill the buffer RxBuffer2_SW used for final data store  */
-		if (RxBufferCirc[RxCounterCirc]=='\r' || RxBufferCirc[RxCounterCirc]=='\n')
-			serialDataReady = 1;
+		//if (RxBufferCirc[RxCounterCirc]=='\r' || RxBufferCirc[RxCounterCirc]=='\n')
+		//	serialDataReady = 1;
 
-		RxBuffer_SW[RxCounter_SW++] = RxBufferCirc[RxCounterCirc++];
+		RxBuffer_SW[RxCounter_SW_UP++] = RxBufferCirc[RxCounterCirc++];
 
 	}  while((RxCounterCirc < (FIFO_SIZE - DMA_GetCurrDataCounter(DMA1_Channel3))));
 
@@ -19,6 +19,11 @@ void USART3_IRQHandler(void)
 	if(RxCounterCirc == FIFO_SIZE)
 	{
 		RxCounterCirc = 0;
+	}
+
+	if(RxCounter_SW_UP == BufferSize)
+	{
+		RxCounter_SW_UP = 0;
 	}
 
 }

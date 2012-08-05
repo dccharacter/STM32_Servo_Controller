@@ -13,6 +13,7 @@
     <Component id="bff208d1-96ed-11df-80ae-001d7d723e56" name="EXTI"/>
     <Component id="bff9a9f1-96ed-11df-80ae-001d7d723e56" name="DMA"/>
     <Component id="c064a0c1-96ed-11df-80ae-001d7d723e56" name="TIM"/>
+    <Component id="c0725c61-96ed-11df-80ae-001d7d723e56" name="ADC"/>
     <Component id="c3dde901-96ed-11df-80ae-001d7d723e56" name="USART"/>
     <Component id="994b0730-4bc0-11e0-8e4a-001d7dcd0baf" name="CMSIS Boot"/>
     <Component id="64d2c4e0-4e11-11e0-8ec0-001d7dcd0baf" name="MISC"/>

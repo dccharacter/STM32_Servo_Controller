@@ -4,8 +4,12 @@
 #include "stm32f10x_dma.h"
 #include "stm32f10x_tim.h"
 #include "stm32f10x_exti.h"
+#include "stm32f10x_adc.h"
 #include "misc.h"
 #include "./hrdw_cfg/hrdw_cfg.h"
+
+#define ADC1_DR_Address    ((uint32_t)0x4001244C)
+#define USART3_DR_Address    ((uint32_t)0x40004804)
 
 void RCC_Configuration(void);
 void GPIO_Configuration(void);
@@ -14,6 +18,7 @@ void DMA_Configuration(void);
 void USART_Configuration(void);
 void TIM_Configuration(void);
 void EXTI_Configuration(void);
+void ADC_Configuration(void);
 
 void Hardware_Configuration (void)
 {
@@ -30,10 +35,16 @@ void Hardware_Configuration (void)
 	USART_Configuration();
 	TIM_Configuration();
 	EXTI_Configuration();
+	ADC_Configuration();
 }
 
 void RCC_Configuration(void)
 {
+	/* Need to slow down ADC clock to have the sensor sampling time
+	 * of 17,1us as specified in reference manual
+	 */
+	RCC_ADCCLKConfig(RCC_PCLK2_Div2);
+
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1 | RCC_APB2Periph_GPIOA |
 			RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO |
 			RCC_APB2Periph_GPIOC |
@@ -158,7 +169,7 @@ void DMA_Configuration(void)
 
 	/* USART3_Rx_DMA_Channel (triggered by USART3 Rx event) Config */
 	DMA_DeInit(DMA1_Channel3);
-	DMA_InitStructure.DMA_PeripheralBaseAddr = 0x40004804;
+	DMA_InitStructure.DMA_PeripheralBaseAddr = USART3_DR_Address;
 	DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)RxBufferCirc;//0x40012C24;
 	DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralSRC;
 	DMA_InitStructure.DMA_BufferSize = 200;
@@ -174,6 +185,23 @@ void DMA_Configuration(void)
 	DMA_ITConfig (DMA1_Channel3, DMA_IT_TC, ENABLE);
 
 	DMA_Cmd(DMA1_Channel3, ENABLE);
+
+	DMA_DeInit(DMA1_Channel1);
+	DMA_InitStructure.DMA_PeripheralBaseAddr = ADC1_DR_Address;
+	DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)ADC_results;
+	DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralSRC;
+	DMA_InitStructure.DMA_BufferSize = 2;
+	DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
+	DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
+	DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Word;
+	DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;
+	DMA_InitStructure.DMA_Mode = DMA_Mode_Circular;
+	DMA_InitStructure.DMA_Priority = DMA_Priority_Low;
+	DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;
+	DMA_Init(DMA1_Channel1, &DMA_InitStructure);
+
+	/* Enable DMA1 channel1 */
+	DMA_Cmd(DMA1_Channel1, ENABLE);
 }
 
 void USART_Configuration(void)
@@ -270,17 +298,38 @@ void EXTI_Configuration(void)
 	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
 	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStructure);
+}
 
-	/*EXTI_InitStructure.EXTI_Line = EXTI_Line1;
-	EXTI_Init(&EXTI_InitStructure);
-	EXTI_InitStructure.EXTI_Line = EXTI_Line2;
-	EXTI_Init(&EXTI_InitStructure);
-	EXTI_InitStructure.EXTI_Line = EXTI_Line3;
-	EXTI_Init(&EXTI_InitStructure);
-	EXTI_InitStructure.EXTI_Line = EXTI_Line10;
-	EXTI_Init(&EXTI_InitStructure);
-	EXTI_InitStructure.EXTI_Line = EXTI_Line11;
-	EXTI_Init(&EXTI_InitStructure);
-	EXTI_InitStructure.EXTI_Line = EXTI_Line12;
-	EXTI_Init(&EXTI_InitStructure);*/
+void ADC_Configuration(void)
+{
+	ADC_InitTypeDef ADC_InitStructure;
+
+	ADC_InitStructure.ADC_Mode = ADC_Mode_Independent;
+	ADC_InitStructure.ADC_ScanConvMode = ENABLE;
+	ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;	// we work in continuous sampling mode
+	ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_None;
+	ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
+	ADC_InitStructure.ADC_NbrOfChannel = 2;
+
+	ADC_RegularChannelConfig(ADC1,ADC_Channel_16, 1, ADC_SampleTime_71Cycles5); // define regular conversion config
+	ADC_RegularChannelConfig(ADC1,ADC_Channel_17, 2, ADC_SampleTime_71Cycles5); // define regular conversion config
+	ADC_Init ( ADC1, &ADC_InitStructure);	//set config of ADC1
+
+	/* Enable ADC1 DMA */
+	ADC_DMACmd(ADC1, ENABLE);
+
+	// enable ADC
+	ADC_Cmd (ADC1,ENABLE);	//enable ADC1
+
+	ADC_TempSensorVrefintCmd (ENABLE);
+
+	//	ADC calibration (optional, but recommended at power on)
+	ADC_ResetCalibration(ADC1);	// Reset previous calibration
+	while(ADC_GetResetCalibrationStatus(ADC1));
+	ADC_StartCalibration(ADC1);	// Start new calibration (ADC must be off at that time)
+	while(ADC_GetCalibrationStatus(ADC1));
+
+	// start conversion
+	ADC_Cmd (ADC1,ENABLE);	//enable ADC1
+	ADC_SoftwareStartConvCmd(ADC1, ENABLE);	// start conversion (will be endless as we are in continuous mode)
 }

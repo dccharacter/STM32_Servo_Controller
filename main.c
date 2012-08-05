@@ -1,6 +1,12 @@
 #include "stm32f10x_tim.h"
 #include "./hrdw_cfg/hrdw_cfg.h"
+#include "./gcode/gcode_parser.h"
 #include <stdio.h>
+
+uint8_t RxBuffer_SW[BufferSize];
+uint8_t RxCounter_SW_UP;
+uint8_t RxCounter_SW_DOWN;
+uint16_t ADC_results[2];
 
 int main(void)
 {
@@ -9,15 +15,12 @@ int main(void)
 	// say hi to host
 	printf("start\n\rok\n\r");
 
-	uint16_t tim2, tim3, tim4;
-	uint16_t k = 0;
-
     while(1)
     {
-    	tim2 = TIM_GetCounter(TIM2);
-    	tim3 = TIM_GetCounter(TIM3);
-    	tim4 = TIM_GetCounter(TIM4);
-    	//printf("tim2 = %d, tim3 = %d, tim4 = %d;\r\n", tim2, tim3, tim4);
-    	while (++k);
+    	if (RxCounter_SW_DOWN != RxCounter_SW_UP)
+    	{
+    		gcode_parse_char(RxBuffer_SW[RxCounter_SW_DOWN]);
+    		if (++RxCounter_SW_DOWN == BufferSize) RxCounter_SW_DOWN=0;
+    	}
     }
 }

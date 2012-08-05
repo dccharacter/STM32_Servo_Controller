@@ -18,8 +18,12 @@
  */
 void PrintChar(char c)
 {
-	while (USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
-	USART_SendData(USART3, (uint8_t) c);
+	/* Send a char like: 
+	   while(Transfer not completed);
+	   Transmit a char;
+	*/	
+	while (!USART_GetFlagStatus(USART3, USART_FLAG_TXE));
+	USART_SendData(USART3, c);
 }
 
 /** Maximum string size allowed (in bytes). */

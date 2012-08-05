@@ -6,12 +6,15 @@
 #define BufferSize             250
 #define FIFO_SIZE              200
 
-char RxBufferCirc[FIFO_SIZE];
-char RxBuffer_SW[BufferSize];
-char RxCounter_SW;
-char RxCounterCirc;
+uint8_t RxBufferCirc[FIFO_SIZE];
+extern uint8_t RxBuffer_SW[BufferSize];
+extern uint8_t RxCounter_SW_UP;
+extern uint8_t RxCounter_SW_DOWN;
+uint8_t RxCounterCirc;
 
-uint8_t serialDataReady;
+extern uint16_t ADC_results[2];
+
+extern uint8_t serialDataReady;
 
 void Hardware_Configuration (void);
 

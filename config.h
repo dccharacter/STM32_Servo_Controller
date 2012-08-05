@@ -34,8 +34,10 @@
 /** \def F_CPU
 	CPU clock rate
 */
+
+
 #ifndef	F_CPU
-	#define	F_CPU	16000000UL
+	#define	F_CPU	24000000UL
 #endif
 
 /** \def HOST
@@ -192,9 +194,9 @@
 	or adjust your electronics to suit this
 */
 
-#define	X_STEP_PIN						AIO0
-#define	X_DIR_PIN							AIO1
-#define	X_MIN_PIN							AIO2
+#define	X_STEP_PIN						0//AIO0
+#define	X_DIR_PIN							0//AIO1
+#define	X_MIN_PIN							0//AIO2
 //#define	X_MAX_PIN							xxxx
 //#define	X_ENABLE_PIN					xxxx
 //#define	X_INVERT_DIR
@@ -202,9 +204,9 @@
 //#define	X_INVERT_MAX
 //#define	X_INVERT_ENABLE
 
-#define	Y_STEP_PIN						AIO3
-#define	Y_DIR_PIN							AIO4
-#define	Y_MIN_PIN							AIO5
+#define	Y_STEP_PIN						0//AIO3
+#define	Y_DIR_PIN							0//AIO4
+#define	Y_MIN_PIN							0//AIO5
 //#define	Y_MAX_PIN							xxxx
 //#define	Y_ENABLE_PIN					xxxx
 //#define	Y_INVERT_DIR
@@ -212,9 +214,9 @@
 //#define	Y_INVERT_MAX
 //#define	Y_INVERT_ENABLE
 
-#define	Z_STEP_PIN						DIO2
-#define	Z_DIR_PIN							DIO3
-#define	Z_MIN_PIN							DIO4
+#define	Z_STEP_PIN						0//DIO2
+#define	Z_DIR_PIN							0//DIO3
+#define	Z_MIN_PIN							0//DIO4
 //#define	Z_MAX_PIN							xxxx
 //#define	Z_ENABLE_PIN					xxxx
 //#define	Z_INVERT_DIR
@@ -222,13 +224,13 @@
 //#define	Z_INVERT_MAX
 //#define	Z_INVERT_ENABLE
 
-#define	E_STEP_PIN						DIO7
-#define	E_DIR_PIN							DIO8
+#define	E_STEP_PIN						0//DIO7
+#define	E_DIR_PIN							0//DIO8
 //#define E_ENABLE_PIN					xxxx
 //#define	E_INVERT_DIR
 //#define	E_INVERT_ENABLE
 
-#define	PS_ON_PIN							DIO9
+#define	PS_ON_PIN							0//DIO9
 //#define	STEPPER_ENABLE_PIN		xxxx
 //#define	STEPPER_INVERT_ENABLE
 
@@ -281,7 +283,17 @@
 	#define DEFINE_TEMP_SENSOR(...)
 #endif
 
+#define THERMISTOR_EXTRUDER 1
+#define HEATER_extruder 0
+#define HEATER_bed 1
 //                 name       type            pin        additional
+/*changes ftom tcup:
+ * I store all ADC data in ADC_results array
+ * The order of data in this array depends on how regular channels are
+ * configured in hwd_cfg file
+ * So we'll keep index of this array instead of pin
+ * 					name		type		arr_index	additional
+ */
 DEFINE_TEMP_SENSOR(extruder,  TT_THERMISTOR,  0,         THERMISTOR_EXTRUDER)
 DEFINE_TEMP_SENSOR(bed,       TT_THERMISTOR,  1,         THERMISTOR_EXTRUDER)
 // "noheater" is a special name for a sensor which doesn't have a heater.
@@ -329,9 +341,12 @@ DEFINE_TEMP_SENSOR(bed,       TT_THERMISTOR,  1,         THERMISTOR_EXTRUDER)
 	#define DEFINE_HEATER(...)
 #endif
 
+#define PB3 0
+#define PB4 0
+
 //            name      port
-DEFINE_HEATER(extruder, PB3)
-DEFINE_HEATER(bed,      PB4)
+//DEFINE_HEATER(extruder, PB3)
+//DEFINE_HEATER(bed,      PB4)
 // DEFINE_HEATER(fan,      PINB4)
 // DEFINE_HEATER(chamber,  PIND7)
 // DEFINE_HEATER(motor,    PIND6)

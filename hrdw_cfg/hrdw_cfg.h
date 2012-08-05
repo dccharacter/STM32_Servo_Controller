@@ -12,7 +12,7 @@ extern uint8_t RxCounter_SW_UP;
 extern uint8_t RxCounter_SW_DOWN;
 uint8_t RxCounterCirc;
 
-extern uint16_t ADC_results[2];
+extern uint32_t ADC_results[2];
 
 extern uint8_t serialDataReady;
 

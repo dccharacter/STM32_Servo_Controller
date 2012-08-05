@@ -1,29 +1,31 @@
-#include	"gcode_process.h"
+#include	"./gcode/gcode_process.h"
 
 /** \file
 	\brief Work out what to do with received G-Code commands
 */
-
+#include <stm32f10x_gpio.h>
 #include	<string.h>
 //#include	<avr/interrupt.h>
 
-#include	"gcode_parse.h"
+#include	"./gcode/gcode_parse.h"
 
 #include	"./dda/dda.h"
 #include	"./dda/dda_queue.h"
 //#include	"watchdog.h"
-//#include	"delay.h"
+#include	"./clock/delay.h"
 #include	"./serial/serial.h"
 #include	"./serial/sermsg.h"
-//#include	"temp.h"
-//#include	"heater.h"
-#include	"timer.h"
+#include	"./extruder/temp.h"
+#include	"./heater/heater.h"
+#include	"./timer/timer.h"
 #include	"./serial/sersendf.h"
-//#include	"pinio.h"
-//#include	"debug.h"
-//#include	"clock.h"
+#include	"./pinio/pinio.h"
+#include	"debug.h"
+#include	"./clock/clock.h"
 #include	"config.h"
 //#include	"home.h"
+
+#define PSTR(x) x
 
 /// the current tool
 uint8_t tool;
@@ -206,32 +208,32 @@ void process_gcode_command() {
 
 				if (next_target.seen_X) {
 					#if defined	X_MIN_PIN
-						home_x_negative();
+						//home_x_negative();
 					#elif defined X_MAX_PIN
-						home_x_positive();
+						//home_x_positive();
 					#endif
 					axisSelected = 1;
 				}
 				if (next_target.seen_Y) {
 					#if defined	Y_MIN_PIN
-						home_y_negative();
+						//home_y_negative();
 					#elif defined Y_MAX_PIN
-						home_y_positive();
+						//home_y_positive();
 					#endif
 					axisSelected = 1;
 				}
 				if (next_target.seen_Z) {
 					#if defined Z_MAX_PIN
-						home_z_positive();
+						//home_z_positive();
 					#elif defined	Z_MIN_PIN
-						home_z_negative();
+						//home_z_negative();
 					#endif
 					axisSelected = 1;
 				}
 				// there's no point in moving E, as E has no endstops
 
 				if (!axisSelected) {
-					home();
+					//home();
 				}
 				break;
 
@@ -308,11 +310,11 @@ void process_gcode_command() {
 				//? Find the minimum limit of the specified axes by searching for the limit switch.
 				//?
 				if (next_target.seen_X)
-					home_x_negative();
+					//home_x_negative();
 				if (next_target.seen_Y)
-					home_y_negative();
+					//home_y_negative();
 				if (next_target.seen_Z)
-					home_z_negative();
+					//home_z_negative();
 				break;
 
 			case 162:
@@ -321,11 +323,11 @@ void process_gcode_command() {
 				//? Find the maximum limit of the specified axes by searching for the limit switch.
 				//?
 				if (next_target.seen_X)
-					home_x_positive();
+					//home_x_positive();
 				if (next_target.seen_Y)
-					home_y_positive();
+					//home_y_positive();
 				if (next_target.seen_Z)
-					home_z_positive();
+					//home_z_positive();
 				break;
 
 				// unknown gcode: spit an error
@@ -377,9 +379,9 @@ void process_gcode_command() {
 				timer_stop();
 				queue_flush();
 				power_off();
-				cli();
-				for (;;)
-					wd_reset();
+				//cli();
+				//for (;;)
+				//	wd_reset();
 				break;
 
 			case 6:
@@ -601,7 +603,7 @@ void process_gcode_command() {
 					queue_wait();
 				#endif
 				update_current_position();
-				sersendf_P(PSTR("X:%lq,Y:%lq,Z:%lq,E:%lq,F:%ld"), current_position.X, current_position.Y, current_position.Z, current_position.E, current_position.F);
+				//sersendf_P(PSTR("X:%lq,Y:%lq,Z:%lq,E:%lq,F:%ld"), current_position.X, current_position.Y, current_position.Z, current_position.E, current_position.F);
 				// newline is sent from gcode_parse after we return
 				break;
 
@@ -687,7 +689,7 @@ void process_gcode_command() {
 				//? --- M140: Set heated bed temperature ---
 				//? Undocumented.
 				#ifdef	HEATER_BED
-					temp_set(HEATER_BED, next_target.S);
+					//temp_set(HEATER_BED, next_target.S);
 					if (next_target.S)
 						power_on();
 				#endif

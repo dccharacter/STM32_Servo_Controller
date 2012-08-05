@@ -13,6 +13,7 @@
 //#include	<avr/interrupt.h>
 //#include	"memory_barrier.h"
 
+#include "stm32f10x_usart.h"
 #include	"config.h"
 //#include	"arduino.h"
 
@@ -84,6 +85,7 @@ volatile uint8_t flowflags = FLOWFLAG_SEND_XON;
 /// set up baud generator and interrupts, clear buffers
 void serial_init()
 {
+#ifdef TRASH
 #if BAUD > 38401
 	UCSR0A = MASK(U2X0);
 	UBRR0 = (((F_CPU / 8) / BAUD) - 0.5);
@@ -96,12 +98,13 @@ void serial_init()
 	UCSR0C = MASK(UCSZ01) | MASK(UCSZ00);
 
 	UCSR0B |= MASK(RXCIE0) | MASK(UDRIE0);
+#endif //#ifdef TRASH
 }
 
 /*
 	Interrupts
 */
-
+#ifdef TRESH
 /// receive interrupt
 ///
 /// we have received a character, stuff it in the rx buffer if we can, or drop it if we can't
@@ -170,6 +173,7 @@ ISR(USART0_UDRE_vect)
 	MEMORY_BARRIER();
 	SREG = sreg_save;
 }
+#endif //#ifdef TRESH
 
 /*
 	Read
@@ -208,6 +212,9 @@ uint8_t serial_popchar()
 /// send one character
 void serial_writechar(uint8_t data)
 {
+	while (!USART_GetFlagStatus(USART3, USART_FLAG_TXE));
+		USART_SendData(USART3, data);
+#ifdef TRASH
 	// check if interrupts are enabled
 	if (SREG & MASK(SREG_I)) {
 		// if they are, we should be ok to block since the tx buffer is emptied from an interrupt
@@ -222,6 +229,7 @@ void serial_writechar(uint8_t data)
 	}
 	// enable TX interrupt so we can send this character
 	UCSR0B |= MASK(UDRIE0);
+#endif //#ifdef TRASH
 }
 
 /// send a whole block
@@ -254,17 +262,23 @@ void serial_writestr(uint8_t *data)
 */
 void serial_writeblock_P(PGM_P data, int datalen)
 {
+#ifdef TRASH
 	int i;
 
 	for (i = 0; i < datalen; i++)
 		serial_writechar(pgm_read_byte(&data[i]));
+#endif //#ifdef TRASH
 }
 
 /// Write string from FLASH
 void serial_writestr_P(PGM_P data)
 {
 	uint8_t r, i = 0;
+	while (*data)
+		serial_writechar(*data++);
+#ifdef TRASH
 	// yes, this is *supposed* to be assignment rather than comparison, so we break when r is assigned zero
 	while ((r = pgm_read_byte(&data[i++])))
 		serial_writechar(r);
+#endif //#ifdef TRASH
 }

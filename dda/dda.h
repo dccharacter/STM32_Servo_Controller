@@ -5,6 +5,8 @@
 
 #include	"config.h"
 
+#define PSTR(x) x
+
 /*
 	micrometer to steps conversion
 

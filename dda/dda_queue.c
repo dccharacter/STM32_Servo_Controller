@@ -5,17 +5,17 @@
 */
 
 #include	<string.h>
-#include	<avr/interrupt.h>
+//#include	<avr/interrupt.h>
 
 #include	"config.h"
-#include	"timer.h"
-#include	"serial.h"
-#include	"sermsg.h"
-#include	"temp.h"
-#include	"delay.h"
-#include	"sersendf.h"
-#include	"clock.h"
-#include	"memory_barrier.h"
+#include	"./timer/timer.h"
+#include	"./serial/serial.h"
+#include	"./serial/sermsg.h"
+//#include	"temp.h"
+//#include	"delay.h"
+#include	"./serial/sersendf.h"
+//#include	"clock.h"
+//#include	"memory_barrier.h"
 
 /// movebuffer head pointer. Points to the last move in the queue.
 /// this variable is used both in and out of interrupts, but is
@@ -47,6 +47,7 @@ uint8_t queue_full() {
 
 /// check if the queue is completely empty
 uint8_t queue_empty() {
+#ifdef TRASH
 	uint8_t save_reg = SREG;
 	cli();
 	CLI_SEI_BUG_MEMORY_BARRIER();
@@ -57,6 +58,7 @@ uint8_t queue_empty() {
 	SREG = save_reg;
 
 	return result;
+#endif //#ifdef TRASH
 }
 
 // -------------------------------------------------------
@@ -96,6 +98,7 @@ void enqueue(TARGET *t) {
 }
 
 void enqueue_home(TARGET *t, uint8_t endstop_check, uint8_t endstop_stop_cond) {
+#ifdef TRASH
 	// don't call this function when the queue is full, but just in case, wait for a move to complete and free up the space for the passed target
 	while (queue_full())
 		delay(WAITING_DELAY);
@@ -136,6 +139,7 @@ void enqueue_home(TARGET *t, uint8_t endstop_check, uint8_t endstop_stop_cond) {
 		// Compensate for the cli() in setTimer().
 		sei();
 	}
+#endif //#ifdef TRASH
 }
 
 /// go to the next move.
@@ -178,6 +182,7 @@ void print_queue() {
 /// dump queue for emergency stop.
 /// \todo effect on startpoint is undefined!
 void queue_flush() {
+#ifdef TRASH
 	// Since the timer interrupt is disabled before this function
 	// is called it is not strictly necessary to write the variables
 	// inside an interrupt disabled block...
@@ -194,6 +199,7 @@ void queue_flush() {
 	
 	MEMORY_BARRIER();
 	SREG = save_reg;
+#endif //#ifdef TRASH
 }
 
 /// wait for queue to empty

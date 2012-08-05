@@ -6,7 +6,7 @@
 uint8_t RxBuffer_SW[BufferSize];
 uint8_t RxCounter_SW_UP;
 uint8_t RxCounter_SW_DOWN;
-uint16_t ADC_results[2];
+uint32_t ADC_results[2];
 
 int main(void)
 {

@@ -1,4 +1,4 @@
-#include	"timer.h"
+#include	"./timer/timer.h"
 
 /** \file
 	\brief Timer management - step pulse clock and system clock
@@ -10,14 +10,14 @@
 	Teacup has tried numerous timer management methods, and this is the best so far.
 */
 
-#include	<avr/interrupt.h>
-#include	"memory_barrier.h"
+//#include	<avr/interrupt.h>
+//#include	"memory_barrier.h"
 
-#include	"arduino.h"
+//#include	"arduino.h"
 #include	"config.h"
 
 #ifdef	HOST
-#include	"dda_queue.h"
+#include	"./dda/dda_queue.h"
 #endif
 
 
@@ -46,6 +46,7 @@ volatile uint8_t	clock_flag_10ms = 0;
 volatile uint8_t	clock_flag_250ms = 0;
 volatile uint8_t	clock_flag_1s = 0;
 
+#ifdef TRASH
 /// comparator B is the system clock, happens every TICK_TIME
 ISR(TIMER1_COMPB_vect) {
 	// save status register
@@ -124,11 +125,12 @@ ISR(TIMER1_COMPA_vect) {
 	SREG = sreg_save;
 }
 #endif /* ifdef HOST */
-
+#endif
 /// initialise timer and enable system clock interrupt.
 /// step interrupt is enabled later when we start using it
 void timer_init()
 {
+#ifdef TRASH
 	// no outputs
 	TCCR1A = 0;
 	// Normal Mode
@@ -137,6 +139,7 @@ void timer_init()
 	OCR1B = TICK_TIME & 0xFFFF;
 	// enable interrupt
 	TIMSK1 = MASK(OCIE1B);
+#endif //#ifdef TRASH
 }
 
 #ifdef	HOST
@@ -150,6 +153,7 @@ void timer_init()
 */
 void setTimer(uint32_t delay)
 {
+#ifdef TRASH
 	uint16_t step_start = 0;
 	#ifdef ACCELERATION_TEMPORAL
 	uint16_t current_time;
@@ -223,11 +227,14 @@ void setTimer(uint32_t delay)
 	// timer1a interrupt to the far side of the return, protecting the 
 	// stack from recursively clobbering memory.
 	TIMSK1 |= MASK(OCIE1A);
+#endif
 }
 
 /// stop timers - emergency stop
 void timer_stop() {
+#ifdef TRASH
 	// disable all interrupts
 	TIMSK1 = 0;
+#endif
 }
 #endif /* ifdef HOST */

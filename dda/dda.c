@@ -1,5 +1,5 @@
-#include	"dda.h"
-
+#include	"./dda/dda.h"
+#include "stm32f10x_gpio.h"
 /** \file
 	\brief Digital differential analyser - this is where we figure out which steppers need to move, and when they need to move
 */
@@ -14,9 +14,9 @@
 #include	"./serial/sermsg.h"
 #include	"./gcode/gcode_parse.h"
 #include	"./dda/dda_queue.h"
-//#include	"debug.h"
+#include	"debug.h"
 #include	"./serial/sersendf.h"
-//#include	"pinio.h"
+#include	"./pinio/pinio.h"
 #include	"config.h"
 //#include "graycode.c"
 
@@ -479,7 +479,7 @@ void dda_start(DDA *dda) {
 	// called from interrupt context: keep it simple!
 	if ( ! dda->nullmove) {
 		// get ready to go
-		psu_timeout = 0;
+		//psu_timeout = 0;
 		if (dda->z_delta)
 			z_enable();
 
@@ -688,7 +688,7 @@ void dda_step(DDA *dda) {
 		// can now be interruptible by other interrupts.
 		// The step interrupt is disabled before entering dda_step() to ensure
 		// that we don't step again while computing the below.
-		sei();
+		//sei();
 	#endif
 
 	#ifdef ACCELERATION_REPRAP

@@ -10,10 +10,10 @@
 #include	"./serial/sermsg.h"
 #include	"./dda/dda_queue.h"
 #include	"debug.h"
-#include	"heater.h"
+//#include	"heater.h"
 #include	"./serial/sersendf.h"
 
-#include	"gcode_process.h"
+#include	"./gcode/gcode_process.h"
 
 /// current or previous gcode word
 /// for working out what to do with data just received
@@ -332,7 +332,8 @@ void gcode_parse_char(uint8_t c) {
 				#endif
 				) {
 				// process
-				serial_writestr_P(PSTR("ok "));
+				//serial_writestr_P(PSTR("ok "));
+				printf("ok T:%u; 1.2V: %u\n", ADC_results[0], ADC_results[1]);
 				process_gcode_command();
 				serial_writechar('\n');
 
@@ -341,12 +342,12 @@ void gcode_parse_char(uint8_t c) {
 					next_target.N_expected = next_target.N + 1;
 			}
 			else {
-				sersendf_P(PSTR("rs N%ld Expected checksum %d\n"), next_target.N_expected, next_target.checksum_calculated);
+				printf("rs N%d Expected checksum %d\n", next_target.N_expected, next_target.checksum_calculated);
 // 				request_resend();
 			}
 		}
 		else {
-			sersendf_P(PSTR("rs N%ld Expected line number %ld\n"), next_target.N_expected, next_target.N_expected);
+			printf("rs N%d Expected line number %d\n", next_target.N_expected, next_target.N_expected);
 // 			request_resend();
 		}
 
@@ -381,7 +382,7 @@ void gcode_parse_char(uint8_t c) {
 \***************************************************************************/
 
 void request_resend(void) {
-	serial_writestr_P(PSTR("rs "));
+	printf("rs ");
 	serwrite_uint8(next_target.N);
 	serial_writechar('\n');
 }

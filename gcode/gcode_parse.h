@@ -5,6 +5,8 @@
 
 #include	"./dda/dda.h"
 
+extern uint32_t ADC_results[2];
+
 // wether to insist on N line numbers
 // if not defined, N's are completely ignored
 //#define	REQUIRE_LINENUMBER

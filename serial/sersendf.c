@@ -6,6 +6,7 @@
 
 #include	<stdarg.h>
 //#include	<avr/pgmspace.h>
+#define PSTR(x) x
 
 #include	"./serial/serial.h"
 #include	"./serial/sermsg.h"
@@ -100,9 +101,13 @@ void sersendf_P(PGM_P format, ...) {
 
 	uint16_t i = 0;
 	uint8_t c = 1, j = 0;
-	while ((c = pgm_read_byte(&format[i++]))) {
+	printf(format, args);
+//#define TRASH
+#ifdef TRASH
+#undef TRASH
+	while (*format) {
 		if (j) {
-			switch(c) {
+			switch(*format) {
 				case 's':
 					j = 1;
 					break;
@@ -144,19 +149,21 @@ void sersendf_P(PGM_P format, ...) {
 					j = 0;
 					break;
 				default:
-					serial_writechar(c);
+					serial_writechar(*format);
 					j = 0;
 					break;
 			}
 		}
 		else {
-			if (c == '%') {
+			if (*format == '%') {
 				j = 2;
 			}
 			else {
-				serial_writechar(c);
+				serial_writechar(*format);
 			}
 		}
+		format++;
 	}
+#endif //#ifdef TRASH
 	va_end(args);
 }

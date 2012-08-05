@@ -5,16 +5,17 @@
 */
 
 #include	<string.h>
+#include	<stdio.h>
 //#include	<avr/interrupt.h>
 
 #include	"config.h"
 #include	"./timer/timer.h"
 #include	"./serial/serial.h"
 #include	"./serial/sermsg.h"
-//#include	"temp.h"
-//#include	"delay.h"
+#include	"./extruder/temp.h"
+#include	"./clock/delay.h"
 #include	"./serial/sersendf.h"
-//#include	"clock.h"
+#include	"./clock/clock.h"
 //#include	"memory_barrier.h"
 
 /// movebuffer head pointer. Points to the last move in the queue.
@@ -37,7 +38,7 @@ DDA movebuffer[MOVEBUFFER_SIZE] __attribute__ ((__section__ (".bss")));
 
 /// check if the queue is completely full
 uint8_t queue_full() {
-	MEMORY_BARRIER();
+	//MEMORY_BARRIER();
 	if (mb_tail > mb_head) {
 		return ((mb_tail - mb_head - 1) == 0) ? 255 : 0;
 	} else {
@@ -47,18 +48,16 @@ uint8_t queue_full() {
 
 /// check if the queue is completely empty
 uint8_t queue_empty() {
-#ifdef TRASH
-	uint8_t save_reg = SREG;
-	cli();
-	CLI_SEI_BUG_MEMORY_BARRIER();
+	//uint8_t save_reg = SREG;
+	//cli();
+	//CLI_SEI_BUG_MEMORY_BARRIER();
 	
 	uint8_t result = ((mb_tail == mb_head) && (movebuffer[mb_tail].live == 0))?255:0;
 
-	MEMORY_BARRIER();
-	SREG = save_reg;
+	//MEMORY_BARRIER();
+	//SREG = save_reg;
 
 	return result;
-#endif //#ifdef TRASH
 }
 
 // -------------------------------------------------------
@@ -74,7 +73,7 @@ void queue_step() {
 			setTimer(HEATER_WAIT_TIMEOUT);
 			if (temp_achieved()) {
 				current_movebuffer->live = current_movebuffer->waitfor_temp = 0;
-				serial_writestr_P(PSTR("Temp achieved\n"));
+				printf("Temp achieved\n");
 			}
 		}
 		else {
@@ -98,7 +97,7 @@ void enqueue(TARGET *t) {
 }
 
 void enqueue_home(TARGET *t, uint8_t endstop_check, uint8_t endstop_stop_cond) {
-#ifdef TRASH
+
 	// don't call this function when the queue is full, but just in case, wait for a move to complete and free up the space for the passed target
 	while (queue_full())
 		delay(WAITING_DELAY);
@@ -107,7 +106,8 @@ void enqueue_home(TARGET *t, uint8_t endstop_check, uint8_t endstop_stop_cond) {
 	h &= (MOVEBUFFER_SIZE - 1);
 
 	DDA* new_movebuffer = &(movebuffer[h]);
-	
+
+
 	if (t != NULL) {
 		dda_create(new_movebuffer, t);
 		new_movebuffer->endstop_check = endstop_check;
@@ -121,25 +121,24 @@ void enqueue_home(TARGET *t, uint8_t endstop_check, uint8_t endstop_stop_cond) {
 
 	// make certain all writes to global memory
 	// are flushed before modifying mb_head.
-	MEMORY_BARRIER();
+	//MEMORY_BARRIER();
 	
 	mb_head = h;
 	
-	uint8_t save_reg = SREG;
-	cli();
-	CLI_SEI_BUG_MEMORY_BARRIER();
+	//uint8_t save_reg = SREG;
+	//cli();
+	//CLI_SEI_BUG_MEMORY_BARRIER();
 
 	uint8_t isdead = (movebuffer[mb_tail].live == 0);
 	
-	MEMORY_BARRIER();
-	SREG = save_reg;
+//	MEMORY_BARRIER();
+//	SREG = save_reg;
 	
 	if (isdead) {
 		next_move();
 		// Compensate for the cli() in setTimer().
-		sei();
+		//sei();
 	}
-#endif //#ifdef TRASH
 }
 
 /// go to the next move.
@@ -176,19 +175,19 @@ void next_move() {
 /// DEBUG - print queue.
 /// Qt/hs format, t is tail, h is head, s is F/full, E/empty or neither
 void print_queue() {
-	sersendf_P(PSTR("Q%d/%d%c"), mb_tail, mb_head, (queue_full()?'F':(queue_empty()?'E':' ')));
+	printf("Q%d/%d%c", mb_tail, mb_head, (queue_full()?'F':(queue_empty()?'E':' ')));
 }
 
 /// dump queue for emergency stop.
 /// \todo effect on startpoint is undefined!
 void queue_flush() {
-#ifdef TRASH
+
 	// Since the timer interrupt is disabled before this function
 	// is called it is not strictly necessary to write the variables
 	// inside an interrupt disabled block...
-	uint8_t save_reg = SREG;
-	cli();
-	CLI_SEI_BUG_MEMORY_BARRIER();
+	//uint8_t save_reg = SREG;
+	//cli();
+	//CLI_SEI_BUG_MEMORY_BARRIER();
 	
 	// flush queue
 	mb_tail = mb_head;
@@ -197,9 +196,8 @@ void queue_flush() {
 	// disable timer
 	setTimer(0);
 	
-	MEMORY_BARRIER();
-	SREG = save_reg;
-#endif //#ifdef TRASH
+	//MEMORY_BARRIER();
+	//SREG = save_reg;
 }
 
 /// wait for queue to empty

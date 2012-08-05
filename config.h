@@ -37,7 +37,8 @@
 
 
 #ifndef	F_CPU
-	#define	F_CPU	24000000UL
+	#include "stm32f10x.h"
+	#define	F_CPU	SystemCoreClock
 #endif
 
 /** \def HOST

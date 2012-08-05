@@ -4,6 +4,8 @@
 	\brief Do stuff periodically
 */
 
+#include <stdio.h>
+#include "stm32f10x_gpio.h"
 #include	"./pinio/pinio.h"
 #include	"./serial/sersendf.h"
 #include	"./dda/dda_queue.h"
@@ -23,31 +25,42 @@
 	called from clock_10ms(), do not call directly
 */
 void clock_250ms() {
-#ifdef TRASH
+
 	#ifndef	NO_AUTO_IDLE
 	if (temp_all_zero())	{
 		if (psu_timeout > (30 * 4)) {
 			power_off();
 		}
+
 		else {
-			uint8_t save_reg = SREG;
-			cli();
-			CLI_SEI_BUG_MEMORY_BARRIER();
+			//uint8_t save_reg = SREG;
+			//cli();
+			//CLI_SEI_BUG_MEMORY_BARRIER();
 			psu_timeout++;
-			MEMORY_BARRIER();
-			SREG = save_reg;
+			//MEMORY_BARRIER();
+			//SREG = save_reg;
 		}
 	}
 	#endif
 
 	ifclock(clock_flag_1s) {
+		GPIOC->ODR ^= GPIO_Pin_9;
 		if (DEBUG_POSITION && (debug_flags & DEBUG_POSITION)) {
 			// current position
 			update_current_position();
-			sersendf_P(PSTR("Pos: %lq,%lq,%lq,%lq,%lu\n"), current_position.X, current_position.Y, current_position.Z, current_position.E, current_position.F);
+			printf("Pos: %d.%u,%d.%u,%d.%u,%d.%u,%lu\n", current_position.X >> 2, (uint8_t)current_position.X & 3,
+					current_position.Y >> 2, (uint8_t)current_position.Y & 3,
+					current_position.Z >> 2, (uint8_t)current_position.Z & 3,
+					current_position.E >> 2, (uint8_t)current_position.E & 3,
+					current_position.F);
 
 			// target position
-			sersendf_P(PSTR("Dst: %lq,%lq,%lq,%lq,%lu\n"), movebuffer[mb_tail].endpoint.X, movebuffer[mb_tail].endpoint.Y, movebuffer[mb_tail].endpoint.Z, movebuffer[mb_tail].endpoint.E, movebuffer[mb_tail].endpoint.F);
+			printf("Dst: %d.%u,%d.%u,%d.%u,%d.%u,%lu\n",
+					movebuffer[mb_tail].endpoint.X >> 2, movebuffer[mb_tail].endpoint.X & 3,
+					movebuffer[mb_tail].endpoint.Y >> 2, movebuffer[mb_tail].endpoint.Y & 3,
+					movebuffer[mb_tail].endpoint.Z >> 2, movebuffer[mb_tail].endpoint.Z & 3,
+					movebuffer[mb_tail].endpoint.E >> 2, movebuffer[mb_tail].endpoint.E & 3,
+					movebuffer[mb_tail].endpoint.F);
 
 			// Queue
 			print_queue();
@@ -62,7 +75,6 @@ void clock_250ms() {
 	#ifdef	TEMP_INTERCOM
 	start_send();
 	#endif
-#endif //#ifdef TRASH
 }
 
 /*! do stuff every 10 milliseconds
@@ -71,14 +83,30 @@ void clock_250ms() {
 */
 void clock_10ms() {
 	// reset watchdog
-#ifdef TRASH
-	wd_reset();
+
+	//wd_reset();
 
 	temp_tick();
 
 	ifclock(clock_flag_250ms) {
 		clock_250ms();
 	}
-#endif //#ifdef TRASH
+
+}
+
+void TimingDelay_Decrement(void)
+{
+
+	clock_flag_10ms = 1;
+	if (clock_counter_250ms++ >= 25)
+	{
+		clock_flag_250ms = 1;
+		clock_counter_250ms = 0;
+	}
+	if (clock_counter_1s++ >=100)
+	{
+		clock_flag_1s = 1;
+		clock_counter_1s = 0;
+	}
 }
 

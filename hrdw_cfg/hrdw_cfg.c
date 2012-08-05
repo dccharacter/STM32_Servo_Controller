@@ -36,6 +36,15 @@ void Hardware_Configuration (void)
 	TIM_Configuration();
 	EXTI_Configuration();
 	ADC_Configuration();
+
+	/*
+	 * Reload Value = SysTick Counter Clock (Hz) x  Desired Time base (s)
+	 */
+	if (SysTick_Config(SystemCoreClock / 100))
+	{
+		/* Capture error */
+		while (1);
+	}
 }
 
 void RCC_Configuration(void)

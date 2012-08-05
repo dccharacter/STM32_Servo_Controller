@@ -5,6 +5,7 @@
 */
 
 #include	<string.h>
+#include	<stdio.h>
 
 #include	"./serial/serial.h"
 #include	"./serial/sermsg.h"
@@ -332,8 +333,8 @@ void gcode_parse_char(uint8_t c) {
 				#endif
 				) {
 				// process
-				//serial_writestr_P(PSTR("ok "));
-				printf("ok T:%u; 1.2V: %u\n", ADC_results[0], ADC_results[1]);
+				printf("ok ");
+				//printf("ok T:%u; 1.2V: %u\n", ADC_results[0], ADC_results[1]);
 				process_gcode_command();
 				serial_writechar('\n');
 

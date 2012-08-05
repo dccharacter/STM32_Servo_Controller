@@ -13,7 +13,7 @@
 //#include	<avr/pgmspace.h>
 
 //#include	"arduino.h"
-//#include	"delay.h"
+#include	"./clock/delay.h"
 #include	"debug.h"
 #ifndef	EXTRUDER
 	#include	"./serial/sersendf.h"

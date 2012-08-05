@@ -2,6 +2,7 @@
 #include "stm32f10x_dma.h"
 #include "stm32f10x_gpio.h"
 #include "stm32f10x_exti.h"
+#include "./clock/clock.h"
 
 void USART3_IRQHandler(void)
 {
@@ -31,12 +32,6 @@ void USART3_IRQHandler(void)
 void DMA1_Channel3_IRQHandler (void)
 {
 	DMA_ClearITPendingBit(DMA1_IT_TC3);
-	/*GPIO_SetBits(GPIOC, GPIO_Pin_8);
-	if (!strcmp((const char*)RxBufferCirc,"rstrst"))
-	{
-		while(1); // wait until reset
-	}*/
-
 }
 
 void EXTI0_IRQHandler(void)
@@ -44,7 +39,6 @@ void EXTI0_IRQHandler(void)
 	if(EXTI_GetITStatus(EXTI_Line0) != RESET)
 	{
 		/* Toggle LED1 */
-		GPIOC->ODR ^= GPIO_Pin_8;
 
 		/* Clear the  EXTI line 0 pending bit */
 		EXTI_ClearITPendingBit(EXTI_Line0);
@@ -56,7 +50,6 @@ void EXTI1_IRQHandler(void)
 	if(EXTI_GetITStatus(EXTI_Line1) != RESET)
 	{
 		/* Toggle LED1 */
-		GPIOC->ODR ^= GPIO_Pin_8;
 
 		/* Clear the  EXTI line 0 pending bit */
 		EXTI_ClearITPendingBit(EXTI_Line1);
@@ -68,7 +61,6 @@ void EXTI2_IRQHandler(void)
 	if(EXTI_GetITStatus(EXTI_Line2) != RESET)
 	{
 		/* Toggle LED1 */
-		GPIOC->ODR ^= GPIO_Pin_9;
 
 		/* Clear the  EXTI line 0 pending bit */
 		EXTI_ClearITPendingBit(EXTI_Line2);
@@ -80,7 +72,6 @@ void EXTI3_IRQHandler(void)
 	if(EXTI_GetITStatus(EXTI_Line3) != RESET)
 	{
 		/* Toggle LED1 */
-		GPIOC->ODR ^= GPIO_Pin_9;
 
 		/* Clear the  EXTI line 0 pending bit */
 		EXTI_ClearITPendingBit(EXTI_Line3);
@@ -92,7 +83,6 @@ void EXTI15_10_IRQHandler(void)
 	if(EXTI_GetITStatus(EXTI_Line10) != RESET)
 	{
 		/* Toggle LED1 */
-		GPIOC->ODR ^= GPIO_Pin_8;
 
 		/* Clear the  EXTI line 0 pending bit */
 		EXTI_ClearITPendingBit(EXTI_Line10);
@@ -101,7 +91,6 @@ void EXTI15_10_IRQHandler(void)
 	if(EXTI_GetITStatus(EXTI_Line11) != RESET)
 	{
 		/* Toggle LED1 */
-		GPIOC->ODR ^= GPIO_Pin_8;
 
 		/* Clear the  EXTI line 0 pending bit */
 		EXTI_ClearITPendingBit(EXTI_Line11);
@@ -110,9 +99,13 @@ void EXTI15_10_IRQHandler(void)
 	if(EXTI_GetITStatus(EXTI_Line12) != RESET)
 	{
 		/* Toggle LED1 */
-		GPIOC->ODR ^= GPIO_Pin_8;
 
 		/* Clear the  EXTI line 0 pending bit */
 		EXTI_ClearITPendingBit(EXTI_Line12);
 	}
+}
+
+void SysTick_Handler(void)
+{
+	TimingDelay_Decrement();
 }

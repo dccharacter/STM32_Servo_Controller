@@ -5,6 +5,7 @@
 */
 #include <stm32f10x_gpio.h>
 #include	<string.h>
+#include	<stdio.h>
 //#include	<avr/interrupt.h>
 
 #include	"./gcode/gcode_parse.h"
@@ -806,7 +807,7 @@ void process_gcode_command() {
 
 				// unknown mcode: spit an error
 			default:
-				sersendf_P(PSTR("E: Bad M-code %d"), next_target.M);
+				printf("E: Bad M-code %d (Maybe DEBUG is disabled in firmware?)", next_target.M);
 				// newline is sent from gcode_parse after we return
 		} // switch (next_target.M)
 	} // else if (next_target.seen_M)

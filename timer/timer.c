@@ -35,11 +35,11 @@ uint32_t	step_extra_time = 0;
 #endif /* ACCELERATION_TEMPORAL */
 
 /// every time our clock fires, we increment this so we know when 10ms has elapsed
-uint8_t						clock_counter_10ms = 0;
+volatile uint8_t clock_counter_10ms = 0;
 /// keep track of when 250ms has elapsed
-uint8_t						clock_counter_250ms = 0;
+volatile uint8_t clock_counter_250ms = 0;
 /// keep track of when 1s has elapsed
-uint8_t						clock_counter_1s = 0;
+volatile uint8_t clock_counter_1s = 0;
 
 /// flags to tell main loop when above have elapsed
 volatile uint8_t	clock_flag_10ms = 0;

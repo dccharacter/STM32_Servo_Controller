@@ -11,6 +11,10 @@
 /*
 clock stuff
 */
+
+extern volatile uint8_t clock_counter_10ms;
+extern volatile uint8_t clock_counter_250ms;
+extern volatile uint8_t	clock_counter_1s;
 extern volatile uint8_t	clock_flag_10ms;
 extern volatile uint8_t	clock_flag_250ms;
 extern volatile uint8_t	clock_flag_1s;

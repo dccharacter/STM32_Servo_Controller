@@ -2,6 +2,7 @@
 #include "./hrdw_cfg/hrdw_cfg.h"
 #include "./gcode/gcode_parse.h"
 #include <stdio.h>
+#include	"./timer/timer.h"
 
 uint8_t RxBuffer_SW[BufferSize];
 uint8_t RxCounter_SW_UP;
@@ -21,6 +22,10 @@ int main(void)
     	{
     		gcode_parse_char(RxBuffer_SW[RxCounter_SW_DOWN]);
     		if (++RxCounter_SW_DOWN == BufferSize) RxCounter_SW_DOWN=0;
+    	}
+
+    	ifclock(clock_flag_10ms) {
+    		clock_10ms();
     	}
     }
 }

@@ -1,6 +1,6 @@
 #include "stm32f10x_tim.h"
 #include "./hrdw_cfg/hrdw_cfg.h"
-#include "./gcode/gcode_parser.h"
+//#include "./gcode/gcode_parser.h"
 #include <stdio.h>
 
 uint8_t RxBuffer_SW[BufferSize];
@@ -19,7 +19,7 @@ int main(void)
     {
     	if (RxCounter_SW_DOWN != RxCounter_SW_UP)
     	{
-    		gcode_parse_char(RxBuffer_SW[RxCounter_SW_DOWN]);
+    		//gcode_parse_char(RxBuffer_SW[RxCounter_SW_DOWN]);
     		if (++RxCounter_SW_DOWN == BufferSize) RxCounter_SW_DOWN=0;
     	}
     }

@@ -188,7 +188,7 @@ void DMA_Configuration(void)
 
 	DMA_DeInit(DMA1_Channel1);
 	DMA_InitStructure.DMA_PeripheralBaseAddr = ADC1_DR_Address;
-	DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)ADC_results;
+	DMA_InitStructure.DMA_MemoryBaseAddr = (uint16_t)ADC_results;
 	DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralSRC;
 	DMA_InitStructure.DMA_BufferSize = 2;
 	DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;

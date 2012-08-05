@@ -1,10 +1,18 @@
+<<<<<<< HEAD
 #include	"./serial/sermsg.h"
+=======
+#include	"sermsg.h"
+>>>>>>> Using original teacup firmware files
 
 /** \file sermsg.c
 	\brief primitives for sending numbers over the serial link
 */
 
+<<<<<<< HEAD
 #include	"./serial/serial.h"
+=======
+#include	"serial.h"
+>>>>>>> Using original teacup firmware files
 
 /** write a single hex digit
 	\param v hex digit to write, higher nibble ignored

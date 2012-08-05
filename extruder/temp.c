@@ -7,6 +7,7 @@
 */
 
 #include	<stdlib.h>
+<<<<<<< HEAD
 #include	<stdio.h>
 //#include	<avr/eeprom.h>
 //#include	<avr/pgmspace.h>
@@ -21,6 +22,18 @@
 	#include	"./serial/sersendf.h"
 #endif
 //#include	"heater.h"
+=======
+#include	<avr/eeprom.h>
+#include	<avr/pgmspace.h>
+
+#include	"arduino.h"
+#include	"delay.h"
+#include	"debug.h"
+#ifndef	EXTRUDER
+	#include	"sersendf.h"
+#endif
+#include	"heater.h"
+>>>>>>> Using original teacup firmware files
 #ifdef	TEMP_INTERCOM
 	#include	"intercom.h"
 #endif
@@ -48,6 +61,7 @@ typedef enum {
 
 /// holds metadata for each temperature sensor
 typedef struct {
+<<<<<<< HEAD
 	//temp_type_t temp_type; ///< type of sensor
 	uint8_t     temp_pin;  ///< pin that sensor is on
 	//heater_t    heater;    ///< associated heater if any
@@ -55,15 +69,29 @@ typedef struct {
 } temp_sensor_definition_t;
 
 #ifdef TRASH
+=======
+	temp_type_t temp_type; ///< type of sensor
+	uint8_t     temp_pin;  ///< pin that sensor is on
+	heater_t    heater;    ///< associated heater if any
+	uint8_t		additional; ///< additional, sensor type specifc config
+} temp_sensor_definition_t;
+
+>>>>>>> Using original teacup firmware files
 #undef DEFINE_TEMP_SENSOR
 /// help build list of sensors from entries in config.h
 #define DEFINE_TEMP_SENSOR(name, type, pin, additional) { (type), (pin), (HEATER_ ## name), (additional) },
 static const temp_sensor_definition_t temp_sensors[NUM_TEMP_SENSORS] =
 {
+<<<<<<< HEAD
 	//#include	"config.h"
 };
 #undef DEFINE_TEMP_SENSOR
 #endif
+=======
+	#include	"config.h"
+};
+#undef DEFINE_TEMP_SENSOR
+>>>>>>> Using original teacup firmware files
 
 /// this struct holds the runtime sensor data- read temperatures, targets, etc
 struct {
@@ -79,9 +107,15 @@ struct {
 
 /// set up temp sensors. Currently only the 'intercom' sensor needs initialisation.
 void temp_init() {
+<<<<<<< HEAD
 	//temp_sensor_t i;
 	//for (i = 0; i < NUM_TEMP_SENSORS; i++) {
 	//	switch(temp_sensors[i].temp_type) {
+=======
+	temp_sensor_t i;
+	for (i = 0; i < NUM_TEMP_SENSORS; i++) {
+		switch(temp_sensors[i].temp_type) {
+>>>>>>> Using original teacup firmware files
 		#ifdef	TEMP_MAX6675
 			// initialised when read
 /*			case TT_MAX6675:
@@ -113,15 +147,25 @@ void temp_init() {
 				break;
 		#endif
 
+<<<<<<< HEAD
 		//	default: /* prevent compiler warning */
 		//		break;
 		//}
 	//}
+=======
+			default: /* prevent compiler warning */
+				break;
+		}
+	}
+>>>>>>> Using original teacup firmware files
 }
 
 /// called every 10ms from clock.c - check all temp sensors that are ready for checking
 void temp_sensor_tick() {
+<<<<<<< HEAD
 #ifdef TRASH
+=======
+>>>>>>> Using original teacup firmware files
 	temp_sensor_t i = 0;
 	for (; i < NUM_TEMP_SENSORS; i++) {
 		if (temp_sensors_runtime[i].next_read_time) {
@@ -310,12 +354,16 @@ void temp_sensor_tick() {
 			heater_tick(temp_sensors[i].heater, temp_sensors[i].temp_type, temp_sensors_runtime[i].last_read_temp, temp_sensors_runtime[i].target_temp);
 		}
 	}
+<<<<<<< HEAD
 #endif
+=======
+>>>>>>> Using original teacup firmware files
 }
 
 /// report whether all temp sensors are reading their target temperatures
 /// used for M109 and friends
 uint8_t	temp_achieved() {
+<<<<<<< HEAD
 	//temp_sensor_t i;
 	uint8_t all_ok = 255;
 
@@ -323,13 +371,26 @@ uint8_t	temp_achieved() {
 		if (temp_sensors_runtime[i].temp_residency < (TEMP_RESIDENCY_TIME*100))
 			all_ok = 0;
 	}*/
+=======
+	temp_sensor_t i;
+	uint8_t all_ok = 255;
+
+	for (i = 0; i < NUM_TEMP_SENSORS; i++) {
+		if (temp_sensors_runtime[i].temp_residency < (TEMP_RESIDENCY_TIME*100))
+			all_ok = 0;
+	}
+>>>>>>> Using original teacup firmware files
 	return all_ok;
 }
 
 /// specify a target temperature
 /// \param index sensor to set a target for
 /// \param temperature target temperature to aim for
+<<<<<<< HEAD
 /*void temp_set(temp_sensor_t index, uint16_t temperature) {
+=======
+void temp_set(temp_sensor_t index, uint16_t temperature) {
+>>>>>>> Using original teacup firmware files
 	if (index >= NUM_TEMP_SENSORS)
 		return;
 
@@ -342,25 +403,44 @@ uint8_t	temp_achieved() {
 			send_temperature(temp_sensors[index].temp_pin, temperature);
 	#endif
 	}
+<<<<<<< HEAD
 }*/
 
 /// return most recent reading for a sensor
 /// \param index sensor to read
 /*uint16_t temp_get(temp_sensor_t index) {
+=======
+}
+
+/// return most recent reading for a sensor
+/// \param index sensor to read
+uint16_t temp_get(temp_sensor_t index) {
+>>>>>>> Using original teacup firmware files
 	if (index >= NUM_TEMP_SENSORS)
 		return 0;
 
 	return temp_sensors_runtime[index].last_read_temp;
+<<<<<<< HEAD
 }*/
 
 uint8_t temp_all_zero() {
 /*	uint8_t i;
+=======
+}
+
+uint8_t temp_all_zero() {
+	uint8_t i;
+>>>>>>> Using original teacup firmware files
 	for (i = 0; i < NUM_TEMP_SENSORS; i++) {
 		if (temp_sensors[i].heater < NUM_HEATERS) {
 			if (temp_sensors_runtime[i].target_temp)
 				return 0;
 		}
+<<<<<<< HEAD
 	}*/
+=======
+	}
+>>>>>>> Using original teacup firmware files
 	return 255;
 }
 
@@ -368,6 +448,7 @@ uint8_t temp_all_zero() {
 #ifndef	EXTRUDER
 /// send temperatures to host
 /// \param index sensor value to send
+<<<<<<< HEAD
 
 void temp_print(void) {
 	uint8_t c = 0;
@@ -376,11 +457,24 @@ void temp_print(void) {
 	//	return;
 
 	c = 234;//(temp_sensors_runtime[index].last_read_temp & 3) * 25;
+=======
+void temp_print(temp_sensor_t index) {
+	uint8_t c = 0;
+
+	if (index >= NUM_TEMP_SENSORS)
+		return;
+
+	c = (temp_sensors_runtime[index].last_read_temp & 3) * 25;
+>>>>>>> Using original teacup firmware files
 
 	#if REPRAP_HOST_COMPATIBILITY >= 20110509
 		sersendf_P(PSTR("T:%u.%u"), temp_sensors_runtime[index].last_read_temp >> 2, c);
 	#else
+<<<<<<< HEAD
 		printf("\nT:%u.%u", 56, c);
+=======
+		sersendf_P(PSTR("\nT:%u.%u"), temp_sensors_runtime[index].last_read_temp >> 2, c);
+>>>>>>> Using original teacup firmware files
 	#endif
 	#ifdef HEATER_BED
 		uint8_t b = 0;
@@ -390,5 +484,8 @@ void temp_print(void) {
 	#endif
 
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> Using original teacup firmware files
 #endif

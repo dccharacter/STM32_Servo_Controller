@@ -2,8 +2,13 @@
 #define	_SERIAL_H
 
 #include	<stdint.h>
+<<<<<<< HEAD
 //#include	<avr/io.h>
 //#include	<avr/pgmspace.h>
+=======
+#include	<avr/io.h>
+#include	<avr/pgmspace.h>
+>>>>>>> Using original teacup firmware files
 
 // initialise serial subsystem
 void serial_init(void);
@@ -24,7 +29,12 @@ void serial_writeblock(void *data, int datalen);
 void serial_writestr(uint8_t *data);
 
 // write from flash
+<<<<<<< HEAD
 //void serial_writeblock_P(PGM_P data, int datalen);
 //void serial_writestr_P(PGM_P data);
+=======
+void serial_writeblock_P(PGM_P data, int datalen);
+void serial_writestr_P(PGM_P data);
+>>>>>>> Using original teacup firmware files
 
 #endif	/* _SERIAL_H */

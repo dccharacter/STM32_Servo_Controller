@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 #include "./serial/serial.h"
 #include "stm32f10x_usart.h"
+=======
+#include	"serial.h"
+>>>>>>> Using original teacup firmware files
 
 /** \file
 	\brief Serial subsystem
@@ -11,11 +15,19 @@
 	It also supports XON/XOFF flow control of the receive buffer, to help avoid overruns.
 */
 
+<<<<<<< HEAD
 //#include	<avr/interrupt.h>
 //#include	"memory_barrier.h"
 
 //#include	"config.h"
 //#include	"arduino.h"
+=======
+#include	<avr/interrupt.h>
+#include	"memory_barrier.h"
+
+#include	"config.h"
+#include	"arduino.h"
+>>>>>>> Using original teacup firmware files
 
 /// size of TX and RX buffers. MUST be a \f$2^n\f$ value
 #define		BUFSIZE			64
@@ -89,6 +101,7 @@ void serial_init()
 	UCSR0A = MASK(U2X0);
 	UBRR0 = (((F_CPU / 8) / BAUD) - 0.5);
 #else
+<<<<<<< HEAD
 	//UCSR0A = 0;
 	//UBRR0 = (((F_CPU / 16) / BAUD) - 0.5);
 #endif
@@ -97,6 +110,16 @@ void serial_init()
 	//UCSR0C = MASK(UCSZ01) | MASK(UCSZ00);
 
 	//UCSR0B |= MASK(RXCIE0) | MASK(UDRIE0);
+=======
+	UCSR0A = 0;
+	UBRR0 = (((F_CPU / 16) / BAUD) - 0.5);
+#endif
+
+	UCSR0B = MASK(RXEN0) | MASK(TXEN0);
+	UCSR0C = MASK(UCSZ01) | MASK(UCSZ00);
+
+	UCSR0B |= MASK(RXCIE0) | MASK(UDRIE0);
+>>>>>>> Using original teacup firmware files
 }
 
 /*
@@ -106,7 +129,11 @@ void serial_init()
 /// receive interrupt
 ///
 /// we have received a character, stuff it in the rx buffer if we can, or drop it if we can't
+<<<<<<< HEAD
 /*#ifdef	USART_RX_vect
+=======
+#ifdef	USART_RX_vect
+>>>>>>> Using original teacup firmware files
 ISR(USART_RX_vect)
 #else
 ISR(USART0_RX_vect)
@@ -137,12 +164,20 @@ ISR(USART0_RX_vect)
 	// restore status register
 	MEMORY_BARRIER();
 	SREG = sreg_save;
+<<<<<<< HEAD
 }*/
+=======
+}
+>>>>>>> Using original teacup firmware files
 
 /// transmit buffer ready interrupt
 ///
 /// provide the next character to transmit if we can, otherwise disable this interrupt
+<<<<<<< HEAD
 /*#ifdef	USART_UDRE_vect
+=======
+#ifdef	USART_UDRE_vect
+>>>>>>> Using original teacup firmware files
 ISR(USART_UDRE_vect)
 #else
 ISR(USART0_UDRE_vect)
@@ -170,7 +205,11 @@ ISR(USART0_UDRE_vect)
 	// restore status register
 	MEMORY_BARRIER();
 	SREG = sreg_save;
+<<<<<<< HEAD
 }*/
+=======
+}
+>>>>>>> Using original teacup firmware files
 
 /*
 	Read
@@ -210,7 +249,11 @@ uint8_t serial_popchar()
 void serial_writechar(uint8_t data)
 {
 	// check if interrupts are enabled
+<<<<<<< HEAD
 	/*if (SREG & MASK(SREG_I)) {
+=======
+	if (SREG & MASK(SREG_I)) {
+>>>>>>> Using original teacup firmware files
 		// if they are, we should be ok to block since the tx buffer is emptied from an interrupt
 		for (;buf_canwrite(tx) == 0;);
 		buf_push(tx, data);
@@ -222,9 +265,13 @@ void serial_writechar(uint8_t data)
 			buf_push(tx, data);
 	}
 	// enable TX interrupt so we can send this character
+<<<<<<< HEAD
 	UCSR0B |= MASK(UDRIE0);*/
 	while (!USART_GetFlagStatus(USART3, USART_FLAG_TXE));
 	USART_SendData(USART3, data);
+=======
+	UCSR0B |= MASK(UDRIE0);
+>>>>>>> Using original teacup firmware files
 }
 
 /// send a whole block
@@ -255,7 +302,11 @@ void serial_writestr(uint8_t *data)
 	For single character writes (i.e. '\n' instead of "\n"), using
 	serial_writechar() directly is the better choice.
 */
+<<<<<<< HEAD
 /*void serial_writeblock_P(PGM_P data, int datalen)
+=======
+void serial_writeblock_P(PGM_P data, int datalen)
+>>>>>>> Using original teacup firmware files
 {
 	int i;
 
@@ -270,4 +321,8 @@ void serial_writestr_P(PGM_P data)
 	// yes, this is *supposed* to be assignment rather than comparison, so we break when r is assigned zero
 	while ((r = pgm_read_byte(&data[i++])))
 		serial_writechar(r);
+<<<<<<< HEAD
 }*/
+=======
+}
+>>>>>>> Using original teacup firmware files

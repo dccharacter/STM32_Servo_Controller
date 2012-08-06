@@ -214,7 +214,7 @@ void dda_create(DDA *dda, TARGET *target) {
 	dda->allflags = 0;
 
 	if (DEBUG_DDA && (debug_flags & DEBUG_DDA))
-		serial_writestr_P(PSTR("\n{DDA_CREATE: ["));
+		printf("\n{DDA_CREATE: [");
 
 	// we end at the passed target
 	memcpy(&(dda->endpoint), target, sizeof(TARGET));
@@ -226,6 +226,7 @@ void dda_create(DDA *dda, TARGET *target) {
 	y_delta_um = (uint32_t)labs(target->Y - startpoint.Y);
 	z_delta_um = (uint32_t)labs(target->Z - startpoint.Z);
 
+	//TODO TODO : change this umto steps
 	um_to_steps_x(steps, target->X);
 	dda->x_delta = labs(steps - startpoint_steps.X);
 	startpoint_steps.X = steps;
@@ -254,7 +255,7 @@ void dda_create(DDA *dda, TARGET *target) {
 	}
 
 	if (DEBUG_DDA && (debug_flags & DEBUG_DDA))
-		sersendf_P(PSTR("%ld,%ld,%ld,%ld] ["), target->X - startpoint.X, target->Y - startpoint.Y, target->Z - startpoint.Z, target->E - startpoint.E);
+		printf("%d,%d,%d,%d] [", target->X - startpoint.X, target->Y - startpoint.Y, target->Z - startpoint.Z, target->E - startpoint.E);
 
 	dda->total_steps = dda->x_delta;
 	if (dda->y_delta > dda->total_steps)
@@ -265,7 +266,7 @@ void dda_create(DDA *dda, TARGET *target) {
 		dda->total_steps = dda->e_delta;
 
 	if (DEBUG_DDA && (debug_flags & DEBUG_DDA))
-		sersendf_P(PSTR("ts:%lu"), dda->total_steps);
+		printf("ts:%u", dda->total_steps);
 
 	if (dda->total_steps == 0) {
 		dda->nullmove = 1;
@@ -458,7 +459,7 @@ void dda_create(DDA *dda, TARGET *target) {
 	}
 
 	if (DEBUG_DDA && (debug_flags & DEBUG_DDA))
-		serial_writestr_P(PSTR("] }\n"));
+		printf("] }\n");
 
 	// next dda starts where we finish
 	memcpy(&startpoint, target, sizeof(TARGET));

@@ -153,7 +153,7 @@ void timer_init()
 */
 void setTimer(uint32_t delay)
 {
-#ifdef TRASH
+
 	uint16_t step_start = 0;
 	#ifdef ACCELERATION_TEMPORAL
 	uint16_t current_time;
@@ -161,17 +161,18 @@ void setTimer(uint32_t delay)
 	#endif /* ACCELERATION_TEMPORAL */
 
 	// re-enable clock interrupt in case we're recovering from emergency stop
-	TIMSK1 |= MASK(OCIE1B);
+	//TIMSK1 |= MASK(OCIE1B);
 
 	// An interrupt would make all our timing calculations invalid,
 	// so stop that here.
-	cli();
-	CLI_SEI_BUG_MEMORY_BARRIER();
+	//cli();
+	//CLI_SEI_BUG_MEMORY_BARRIER();
 
 	// Assume all steps belong to one move. Within one move the delay is
 	// from one step to the next one, which should be more or less the same
 	// as from one step interrupt to the next one. The last step interrupt happend
 	// at OCR1A, so start delay from there.
+#ifdef TRASH
 	step_start = OCR1A;
 	if (next_step_time == 0) {
 		// new move, take current time as start value

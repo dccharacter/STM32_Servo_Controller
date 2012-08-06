@@ -3,6 +3,7 @@
 #include "./gcode/gcode_parse.h"
 #include <stdio.h>
 #include	"./timer/timer.h"
+#include	"./clock/clock.h"
 
 uint8_t RxBuffer_SW[BufferSize];
 uint8_t RxCounter_SW_UP;

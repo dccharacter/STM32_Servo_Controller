@@ -137,12 +137,12 @@ void GPIO_Configuration(void)
 
 	/* EXTI lines configuration
 	 * EXTI0 connected to PA0 - push button on STM32VL-Discovery
-	 * EXTI1 - PC1 (endstop #1)
-	 * EXTI2 - PC2 (endstop #2)
-	 * EXTI3 - PC3 (endstop #3)
-	 * EXTI10 - PC10 (endstop #4)
-	 * EXTI11 - PC11 (endstop #5)
-	 * EXTI12 - PC12 (endstop #6)
+	 * EXTI1 - PC1 (endstop #1) X_MIN_PIN
+	 * EXTI2 - PC2 (endstop #2) X_MAX_PIN
+	 * EXTI3 - PC3 (endstop #3) Y_MIN_PIN
+	 * EXTI10 - PC10 (endstop #4) Y_MAX_PIN
+	 * EXTI11 - PC11 (endstop #5) Z_MIN_PIN
+	 * EXTI12 - PC12 (endstop #6) Z_MAX_PIN
 	 */
 	GPIO_EXTILineConfig(GPIO_PortSourceGPIOA, GPIO_PinSource0);
 

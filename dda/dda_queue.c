@@ -161,7 +161,7 @@ void next_move() {
 		mb_tail = t;
 		if (current_movebuffer->waitfor_temp) {
 			#ifndef	REPRAP_HOST_COMPATIBILITY
-				serial_writestr_P(PSTR("Waiting for target temp\n"));
+				printf("Waiting for target temp\n");
 			#endif
 			current_movebuffer->live = 1;
 			setTimer(HEATER_WAIT_TIMEOUT);

@@ -35,6 +35,8 @@
 	CPU clock rate
 */
 
+#define SERVOS
+
 
 #ifndef	F_CPU
 	#include "stm32f10x.h"
@@ -64,10 +66,10 @@
 
 	half-stepping doubles the number, quarter stepping requires * 4, etc.
 
-	valid range = 20 to 4'0960'000 (0.02 to 40960 steps/mm)
+	valid range = 20 to 40'960'000 (0.02 to 40960 steps/mm)
 */
-#define	STEPS_PER_M_X					320000
-#define	STEPS_PER_M_Y					320000
+#define	STEPS_PER_M_X					1024000
+#define	STEPS_PER_M_Y					1024000
 #define	STEPS_PER_M_Z					320000
 
 /// http://blog.arcol.hu/?p=157 may help with this one
@@ -197,8 +199,10 @@
 
 #define	X_STEP_PIN						0//AIO0
 #define	X_DIR_PIN							0//AIO1
-#define	X_MIN_PIN							0//AIO2
-//#define	X_MAX_PIN							xxxx
+#define	X_MIN_PIN GPIO_Pin_1
+#define	X_MAX_PIN GPIO_Pin_2
+#define X_MAX_GPIO	GPIOC
+#define X_MIN_GPIO	GPIOC
 //#define	X_ENABLE_PIN					xxxx
 //#define	X_INVERT_DIR
 //#define	X_INVERT_MIN
@@ -207,8 +211,10 @@
 
 #define	Y_STEP_PIN						0//AIO3
 #define	Y_DIR_PIN							0//AIO4
-#define	Y_MIN_PIN							0//AIO5
-//#define	Y_MAX_PIN							xxxx
+#define	Y_MIN_PIN GPIO_Pin_3
+#define	Y_MAX_PIN GPIO_Pin_10
+#define Y_MAX_GPIO	GPIOC
+#define Y_MIN_GPIO	GPIOC
 //#define	Y_ENABLE_PIN					xxxx
 //#define	Y_INVERT_DIR
 //#define	Y_INVERT_MIN
@@ -217,8 +223,10 @@
 
 #define	Z_STEP_PIN						0//DIO2
 #define	Z_DIR_PIN							0//DIO3
-#define	Z_MIN_PIN							0//DIO4
-//#define	Z_MAX_PIN							xxxx
+//#define	Z_MIN_PIN GPIO_Pin_11
+//#define	Z_MAX_PIN GPIO_Pin_12
+//#define Z_MAX_GPIO	GPIOC
+//#define Z_MIN_GPIO	GPIOC
 //#define	Z_ENABLE_PIN					xxxx
 //#define	Z_INVERT_DIR
 //#define	Z_INVERT_MIN

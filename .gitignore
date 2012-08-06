@@ -1,3 +1,10 @@
+#############
+## CooCox
+#############
+link.ld
+build.xml
+debug.config
+
 #################
 ## Eclipse
 #################

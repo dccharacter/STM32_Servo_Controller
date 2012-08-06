@@ -55,6 +55,7 @@ void RCC_Configuration(void)
 	RCC_ADCCLKConfig(RCC_PCLK2_Div2);
 
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1 | RCC_APB2Periph_GPIOA |
+			RCC_APB2Periph_TIM16 | RCC_APB2Periph_TIM17 | RCC_APB2Periph_TIM15 |
 			RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO |
 			RCC_APB2Periph_GPIOC |
 			RCC_APB2Periph_ADC1, ENABLE);
@@ -109,6 +110,27 @@ void GPIO_Configuration(void)
 	 */
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9 |
 			GPIO_Pin_10 | GPIO_Pin_11;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+	/* PWM Generation:
+	 * TIM16, TIM16_REMAP = 0 (no remap)
+	 * CH1 - PB8
+	 * TIM17, TIM17_REMAP = 0 (no remap)
+	 * CH1 - PB9
+	 */
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+	/* PWM Generation:
+	 * TIM15_REMAP = 0 (no remap)
+	 * CH1 - PA2
+	 * CH2 - PA3
+	 */
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2 | GPIO_Pin_3;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
@@ -265,13 +287,20 @@ void TIM_Configuration(void)
     uint16_t CCR1_Val3 = 1030;
 
 
-    /* Time base configuration */
+    /* TIM1 4 PWM channels configuration
+     * TIM15 2 PWM channels configuration
+     * TIM16 1 PWM channel configuration
+     * TIM17 1 PWM channel configuration
+     * Time base configuration */
     TIM_TimeBaseStructure.TIM_Period = (uint16_t) (SystemCoreClock/TimerFrequency);
     TIM_TimeBaseStructure.TIM_Prescaler = PrescalerValue;
     TIM_TimeBaseStructure.TIM_ClockDivision = 0;
     TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
 
     TIM_TimeBaseInit(TIM1, &TIM_TimeBaseStructure);
+    TIM_TimeBaseInit(TIM15, &TIM_TimeBaseStructure);
+    TIM_TimeBaseInit(TIM16, &TIM_TimeBaseStructure);
+    TIM_TimeBaseInit(TIM17, &TIM_TimeBaseStructure);
 
     /* PWM2 Mode configuration: Channel1 */
     TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM2;
@@ -291,10 +320,32 @@ void TIM_Configuration(void)
     TIM_OCInitStructure.TIM_Pulse = CCR1_Val3;
     TIM_OC4Init(TIM1, &TIM_OCInitStructure);
 
-    /* TIM3 enable counter */
+    TIM_OCInitStructure.TIM_Pulse = CCR1_Val1;
+    TIM_OC1Init(TIM15, &TIM_OCInitStructure);
+
+    TIM_OCInitStructure.TIM_Pulse = CCR1_Val3;
+    TIM_OC2Init(TIM15, &TIM_OCInitStructure);
+
+    TIM_OCInitStructure.TIM_Pulse = CCR1_Val1;
+    TIM_OC1Init(TIM16, &TIM_OCInitStructure);
+
+    TIM_OCInitStructure.TIM_Pulse = CCR1_Val3;
+    TIM_OC1Init(TIM17, &TIM_OCInitStructure);
+
+
+    /* TIM15
+     * TIM16
+     * TIM17
+     * enable counter */
     TIM_Cmd(TIM1, ENABLE);
+    TIM_Cmd(TIM15, ENABLE);
+    TIM_Cmd(TIM16, ENABLE);
+    TIM_Cmd(TIM17, ENABLE);
 
     TIM_CtrlPWMOutputs(TIM1, ENABLE);
+    TIM_CtrlPWMOutputs(TIM15, ENABLE);
+    TIM_CtrlPWMOutputs(TIM16, ENABLE);
+    TIM_CtrlPWMOutputs(TIM17, ENABLE);
 }
 
 void EXTI_Configuration(void)

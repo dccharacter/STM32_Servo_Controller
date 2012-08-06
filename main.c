@@ -18,6 +18,7 @@ int main(void)
 
     while(1)
     {
+    	uint16_t TIMx = TIM_GetCounter(TIM4);
     	if (RxCounter_SW_DOWN != RxCounter_SW_UP)
     	{
     		gcode_parse_char(RxBuffer_SW[RxCounter_SW_DOWN]);
